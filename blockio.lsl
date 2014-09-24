@@ -1,10 +1,3 @@
-// This script is a designed to make cryptocurrency transactions in Opensimulator easy without the need for an 
-// explicit currency module.  It is currently oriented towards use with Dogecoin, but is compatible with Bitcoin and
-// Litecoin as well.  
-
-// The script uses a simple link message api to interact with other scripts in the object, making it easy to integrate
-// into your own projects.
-
 string api_key = "";
 
 string base_wallet_url = "https://block.io/api/v1/";
@@ -28,27 +21,29 @@ list strip_json(string json, list filter)
     return elements;        
 }
 
-//parse a payment address from a get_new_address call
+//parse a payment address from a get_new_address call;
 string parse_address(string body_json)
 {
     string address = "";
+
     list elements = strip_json(body_json,[]); 
     integer index = llListFindList(elements,["address"]);
-    
     if(index >= 0){ address = llList2String(elements,index+1); }
     
     return address;
 }
 
-//parse the current amount in the payment address from a get_address_balance call
 float parse_amount(string body_json)
 {
     float amount = 0.0;
+    
     list elements = strip_json(body_json,[]);
+    
     string selector = "";
     
     if(fast_confirm){ selector = "unconfirmed_received_balance"; }
     else{ selector = "available_balance"; }
+    
     integer index = llListFindList(elements,[selector]);
     
     if(index >= 0){ amount = llList2Float(elements,index+1); }
@@ -160,8 +155,11 @@ state request_payment
     {
         string pay_msg = "Please send " +  (string)purchase_amount + " to " + payment_address + "\n" +
             "Touch to confirm payment\n" + 
-            "Say \"QR\" for a payment QR code";
-        string label = "Waiting for payment input";
+            "Say \"QR\" for a payment QR code \n" +
+            "or \"CANCEL\" to cancel transaction";
+            
+        string label = "Waiting for payment input \n"
+                        + "Touch to confirm payment";
                 
         llSetText(label,<1.0,1.0,1.0>,1.0);
         llSay(0,pay_msg);
@@ -171,7 +169,12 @@ state request_payment
     listen(integer c, string name, key k, string msg)
     {
         msg = llToUpper(msg);
-        if(msg == "QR"){load_qr();}
+        if(msg == "QR"){load_qr();}else
+        if(msg == "CANCEL")
+        {
+            complete_transaction(FALSE);
+            state default;
+        }
     }
     
     touch_start(integer n)
@@ -220,7 +223,7 @@ state confirm_transaction
             }
             else
             {
-                llSay(0,"Got Error Code " + (string)status);   
+                llOwnerSay("Got Error Code " + (string)status);   
             }      
         }
     }
@@ -243,10 +246,10 @@ state initialize
             if( llList2String(params,0) == "api_key" )
             { 
                 api_key = llList2String(params,1);
-                llOwnerSay("Successfully loaded config file"); 
+                llOwnerSay("Successfully loaded BlockIO config file"); 
                 state default;    
             }
-            else { llOwnerSay( "Error reading config file" ); }
+            else { llOwnerSay( "Error reading BlockIO config file" ); }
         }        
     }
     
