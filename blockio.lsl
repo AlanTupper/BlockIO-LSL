@@ -114,7 +114,12 @@ default
             purchase_amount = (float)amount;
             sender = origin;
             
-            state fetch_address;
+            if(purchase_amount == 0.0)
+            {
+                complete_transaction(TRUE);
+                state default;
+            } 
+            else {state fetch_address;}
         }   
     }
 
@@ -206,12 +211,6 @@ state confirm_transaction
         {
             if(status == 200)
             {
-               /* if(purchase_amount <= parse_amount_recieved(body))
-                {
-                    llSetTimerEvent(0.0);
-                    complete_transaction(); 
-                }*/
-                //float amount = llList2Float(llParseString2List(body,[],[]),0);
                 float amount = parse_amount(body);
                 
                 if(amount >= purchase_amount)
