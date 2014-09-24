@@ -10,6 +10,10 @@ Works with vanilla Opensimulator/SL/Whitecore.
 Requires a notecard named BlockIO_Config in the object's inventory.  This contains the API key for the seller's Block.io account (seller will need a Block.io account).  Probably a good idea to lock that cards permissions down.
 
 
+Compatible Scripts:
+============
+* SimpleBlockIOVendor: https://github.com/AlanTupper/SimpleBlockIOVendor
+
 Coming Soon:
 ============
 * API documentation
