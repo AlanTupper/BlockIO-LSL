@@ -94,7 +94,6 @@ default
     
     state_entry()
     {
-        llSetText("",<1.0,1.0,1.0>,0.0);
         
         //load from config if we're coming from a hard reset.
         if(api_key == ""){state initialize;}  
@@ -163,10 +162,6 @@ state request_payment
             "Say \"QR\" for a payment QR code \n" +
             "or \"CANCEL\" to cancel transaction";
             
-        string label = "Waiting for payment input \n"
-                        + "Touch to confirm payment";
-                
-        llSetText(label,<1.0,1.0,1.0>,1.0);
         llSay(0,pay_msg);
         llListen(0,"",payer,"");
     }
@@ -192,8 +187,8 @@ state confirm_transaction
 {
     state_entry()
     {
-        string label = "Confirming Payment, please wait...";
-        llSetText(label,<1.0,1.0,1.0>,1.0);
+        string confirm_msg = "Confirming Payment, please wait...";
+        llSay(0,confirm_msg);
                 
         llSetTimerEvent(10.0);    
     }
@@ -233,7 +228,7 @@ state initialize
 {
     state_entry()
     {
-        llSetText("Initializing",<1.0,1.0,1.0>,1.0);
+        llOwnerSay("Initializing");
         curr_req = llGetNotecardLine("BlockIO_Config",0);   
     }
     
